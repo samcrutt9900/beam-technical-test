@@ -39,7 +39,7 @@ with beam.Pipeline() as pipeline:
     minTransactionTransform = lines | 'Filter min transaction' >> beam.Filter(
         filterByMinTransactionValue, 20)
     minDateTransform = minTransactionTransform | 'Filter min date' >> beam.Filter(
-        filterByMinDateValue, datetime(2009, 12, 31))
+        filterByMinDateValue, datetime(2010, 1, 1))
     sumRecordsByDate = (minDateTransform | 'Map to tuple keyed by date' >>
                         beam.Map(lambda item: (item['date'], item['amount']))
                         | beam.CombinePerKey(sum))
