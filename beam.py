@@ -31,17 +31,25 @@ def filterByMinDateValue(item, minDate):
     return item['timestamp'] >= minDate
 
 
+@beam.ptransform_fn
+def SumTransactionByValueAndDate(pcoll):
+    return (
+        pcoll
+        | 'Filter min transaction' >> beam.Filter(
+          filterByMinTransactionValue, 20)
+        | 'Filter min date' >> beam.Filter(
+          filterByMinDateValue, datetime(2010, 1, 1))
+        | 'Map to tuple keyed by date' >>
+        beam.Map(lambda item: (item['date'], item['amount']))
+        | beam.CombinePerKey(sum)
+        | beam.ParDo(Output())
+    )
+
+
 # Create the pipeline and run it
 with beam.Pipeline() as pipeline:
     lines = (pipeline
              | 'ReadMyFile' >> beam.io.ReadFromText('gs://cloud-samples-data/bigquery/sample-transactions/transactions.csv', skip_header_lines=1)
              | beam.ParDo(SplitCSV()))
-    minTransactionTransform = lines | 'Filter min transaction' >> beam.Filter(
-        filterByMinTransactionValue, 20)
-    minDateTransform = minTransactionTransform | 'Filter min date' >> beam.Filter(
-        filterByMinDateValue, datetime(2010, 1, 1))
-    sumRecordsByDate = (minDateTransform | 'Map to tuple keyed by date' >>
-                        beam.Map(lambda item: (item['date'], item['amount']))
-                        | beam.CombinePerKey(sum))
-    _ = sumRecordsByDate | beam.ParDo(Output()) | beam.io.WriteToText(
-        "output/results.json", shard_name_template='', file_name_suffix=".gz")
+    _ = (lines | SumTransactionByValueAndDate()
+         | beam.io.WriteToText("output/results.json", shard_name_template='', file_name_suffix=".gz"))
