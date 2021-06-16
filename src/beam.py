@@ -1,5 +1,4 @@
 import apache_beam as beam
-from apache_beam.io.gcp.gcsio import GcsIO
 from datetime import datetime
 
 # Split the CSV input data and return the fields of interest for the next transform
@@ -30,7 +29,8 @@ def filterByMinTransactionValue(item, minTransactionValue):
 def filterByMinDateValue(item, minDate):
     return item['timestamp'] >= minDate
 
-
+#composite transform grouping together the filter operations
+#and the sum operation.
 @beam.ptransform_fn
 def SumTransactionByValueAndDate(pcoll):
     return (
