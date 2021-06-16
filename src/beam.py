@@ -46,10 +46,14 @@ def SumTransactionByValueAndDate(pcoll):
     )
 
 
-# Create the pipeline and run it
-with beam.Pipeline() as pipeline:
-    lines = (pipeline
-             | 'ReadMyFile' >> beam.io.ReadFromText('gs://cloud-samples-data/bigquery/sample-transactions/transactions.csv', skip_header_lines=1)
-             | beam.ParDo(SplitCSV()))
-    _ = (lines | SumTransactionByValueAndDate()
-         | beam.io.WriteToText("output/results.json", shard_name_template='', file_name_suffix=".gz"))
+def run():
+    # Create the pipeline and run it
+    with beam.Pipeline() as pipeline:
+      lines = (pipeline
+               | 'ReadMyFile' >> beam.io.ReadFromText('gs://cloud-samples-data/bigquery/sample-transactions/transactions.csv', skip_header_lines=1)
+               | beam.ParDo(SplitCSV()))
+      _ = (lines | SumTransactionByValueAndDate()
+           | beam.io.WriteToText("output/results.json", shard_name_template='', file_name_suffix=".gz"))
+
+if __name__ == '__main__':
+    run()

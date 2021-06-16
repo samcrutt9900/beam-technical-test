@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-apache-beam = {extras = ["gcp"], version = "*"}
+apache-beam = {extras = ["test"], version = "*"}
 
 [dev-packages]
 autopep8 = "*"
