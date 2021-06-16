@@ -1,5 +1,4 @@
-from apache_beam.testing.util import assert_that, is_not_empty
-from apache_beam.testing.util import equal_to
+from apache_beam.testing.util import assert_that, is_not_empty, equal_to
 import apache_beam
 from apache_beam.testing.test_pipeline import TestPipeline
 import unittest
