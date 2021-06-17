@@ -4,6 +4,7 @@ from apache_beam.testing.test_pipeline import TestPipeline
 import unittest
 from src.beam import SumTransactionByValueAndDate
 from src.beam import SplitCSV
+import json
 
 
 class SumTransactionByValueAndDateTest(unittest.TestCase):
@@ -21,10 +22,9 @@ class SumTransactionByValueAndDateTest(unittest.TestCase):
         p = TestPipeline()
         input = p | apache_beam.Create(self.DATA) | apache_beam.ParDo(SplitCSV())
         output = input | SumTransactionByValueAndDate()
-        assert_that(output, equal_to([
-            {'date': '2010/01/01', 'total_amount': 30.0},
-            {'date': '2017/01/01', 'total_amount': 65.0}
-            ]))
+        assert_that(output, equal_to(
+            ['["2010-01-01", "30.00"]', '["2017-01-01", "65.00"]']
+            ))
             
         p.run()
 
