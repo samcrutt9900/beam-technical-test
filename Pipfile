@@ -4,10 +4,11 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-apache-beam = {extras = ["test"], version = "*"}
+apache-beam = {version = "==2.30.0", extras = ["gcp"]}
 
 [dev-packages]
 autopep8 = "*"
+apache-beam = {version = "==2.30.0", extras = ["test"]}
 
 [requires]
 python_version = "3.8"
