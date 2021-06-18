@@ -27,6 +27,7 @@ class SumTransactionByValueAndDateTest(unittest.TestCase):
             ))
             
         p.run()
+    
 
 
 if __name__ == '__main__':

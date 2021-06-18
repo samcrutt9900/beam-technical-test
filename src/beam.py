@@ -3,6 +3,8 @@ from datetime import date, datetime
 from decimal import Decimal
 from dataclasses import dataclass
 import json
+import csv
+import io
 
 #Dataclass representing the input data
 @dataclass
@@ -13,11 +15,11 @@ class TransactionData:
 
 # Split the CSV input data and return the fields of interest for the next transform
 class SplitCSV(beam.DoFn):
-    #TODO use the inbuilt CSV lib to parse this
     def process(self, element):
-        timestamp, origin, destination, transaction_amount = element.split(",")
-        date_time_obj = datetime.strptime(timestamp, '%Y-%m-%d %H:%M:%S UTC')
-        return [TransactionData(date_time_obj.strftime("%Y-%m-%d"), date_time_obj,Decimal(transaction_amount) )]
+        csvReader = csv.reader([element], delimiter=',')
+        item = next(csvReader)
+        date_time_obj = datetime.strptime(item[0], '%Y-%m-%d %H:%M:%S UTC')
+        return [TransactionData(date_time_obj.strftime("%Y-%m-%d"), date_time_obj,Decimal(item[3]) )]
 
 # Transform the data into a format that can be output to JSON
 class Output(beam.DoFn):
@@ -56,7 +58,6 @@ def run():
       lines = (pipeline
                | 'ReadMyFile' >> beam.io.ReadFromText('gs://cloud-samples-data/bigquery/sample-transactions/transactions.csv', skip_header_lines=1)
                | beam.ParDo(SplitCSV()))
-      #TODO use jsonl lib
       _ = (lines | SumTransactionByValueAndDate()
            | beam.io.WriteToText("output/results.jsonl", shard_name_template='', file_name_suffix=".gz"))
 
