@@ -4,7 +4,6 @@ from decimal import Decimal
 from dataclasses import dataclass
 import json
 import csv
-import io
 
 #Dataclass representing the input data
 @dataclass
